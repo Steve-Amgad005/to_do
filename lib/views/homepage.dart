@@ -59,6 +59,7 @@ class _Homepage extends State<Homepage> {
               }
               viewModel.notifyListeners(); // لتحديث الـ UI بعد الـ sort
             },
+            color: Colors.grey[900],
             itemBuilder: (context) => [
               PopupMenuItem(
                 value: "date",

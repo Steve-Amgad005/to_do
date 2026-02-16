@@ -5,7 +5,7 @@ class TaskViewModel extends ChangeNotifier {
   List<Task> _tasks = [
     Task(
       title: "Buy groceries",
-      priority: "medium",
+      priority: "low",
       deadline: DateTime(2026,2,16),
       isDone: false,
     ),
@@ -14,11 +14,21 @@ class TaskViewModel extends ChangeNotifier {
       priority: "high",
       deadline: DateTime(2026,2,17),
       isDone: false,
+    ),Task(
+      title: "Complete Flutter",
+      priority: "high",
+      deadline: DateTime(2026,2,20),
+      isDone: false,
     ),
     Task(
       title: "Walk the dog",
-      priority: "low",
+      priority: "medium",
       deadline: DateTime(2026,2,14),
+      isDone: true,
+    ),Task(
+      title: "take medicine",
+      priority: "high",
+      deadline: DateTime(2026,2,15),
       isDone: true,
     ),
     Task(
