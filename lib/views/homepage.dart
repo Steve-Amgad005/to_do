@@ -72,7 +72,6 @@ class _Homepage extends State<Homepage> {
             ],
           )
 
-
         ],
       ),
       bottomNavigationBar: Padding(

@@ -65,8 +65,7 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
                 .map((priority) => DropdownMenuItem(
               value: priority,
               child: Text(priority, style: TextStyle(color: Colors.white)),
-            ))
-                .toList(),
+            )).toList(),
             onChanged: (value) {
               setState(() {
                 selectedPriority = value!;
@@ -74,10 +73,9 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
             },
           ),
           SizedBox(height: 20),
-          // TextField للتاريخ مع Calendar
           TextField(
             controller: dateController,
-            readOnly: true, // لا يمكن الكتابة يدويًا
+            readOnly: true,
             style: TextStyle(color: Colors.white),
             decoration: InputDecoration(
               hintText: "Select deadline",
@@ -102,10 +100,10 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
                         return Theme(
                           data: Theme.of(context).copyWith(
                             colorScheme: ColorScheme.dark(
-                              primary: Colors.yellow[700]!, // لون زر OK
-                              onPrimary: Colors.black, // لون نص زر OK
-                              surface: Colors.grey[900]!, // خلفية calendar
-                              onSurface: Colors.white, // نص الأيام
+                              primary: Colors.yellow[700]!,
+                              onPrimary: Colors.black,
+                              surface: Colors.grey[900]!,
+                              onSurface: Colors.white,
                             ),
                             dialogBackgroundColor: Colors.grey[900],
                           ),

@@ -2,12 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:to_do/views/homepage.dart';
 import 'package:provider/provider.dart';
 import 'view_models/task_view_model.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-void main() {
-  runApp(ChangeNotifierProvider(
-    create: (context) => TaskViewModel(),
-    child: const MyApp(),
-  ),);
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+  await Hive.openBox('tasksBox');
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => TaskViewModel(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -15,9 +22,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Homepage(),
-    );
+    return MaterialApp(debugShowCheckedModeBanner: false, home: Homepage());
   }
 }
