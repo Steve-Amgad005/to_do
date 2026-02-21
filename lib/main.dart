@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:to_do/views/auth/login.dart';
+import 'package:to_do/views/auth/register.dart';
 import 'package:to_do/views/homepage.dart';
 import 'package:provider/provider.dart';
 import 'view_models/task_view_model.dart';
@@ -22,6 +24,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: Homepage());
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: LoginPage(),
+      routes: {
+        "home": (context) => Homepage(),
+        "login": (context) => LoginPage(),
+        "register": (context) => RegisterPage(),
+      },
+    );
   }
 }
