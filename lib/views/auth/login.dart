@@ -16,6 +16,85 @@ class _LoginPage extends State<LoginPage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  void _showWarningDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: Text("Warning", style: TextStyle(color: Colors.white)),
+        content: Text(
+          message,
+          style: TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("OK", style: TextStyle(color: Colors.yellow[700])),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _login() async {
+    String email = emailController.text.trim();
+    String password = passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      showDialog(
+        context: context,
+        builder:
+            (_) => AlertDialog(
+          backgroundColor: Colors.grey[900],
+          title: Text("Warning", style: TextStyle(color: Colors.white)),
+          content: Text(
+            "Please fill all fields",
+            style: TextStyle(color: Colors.white70),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                "OK",
+                style: TextStyle(color: Colors.yellow[700]),
+              ),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    final authVM = context.read<AuthViewModel>();
+
+    bool success = await authVM.login(email, password);
+
+    if (success) {
+      Navigator.pushReplacementNamed(context, "home");
+    } else {
+      showDialog(
+        context: context,
+        builder:
+            (_) => AlertDialog(
+          backgroundColor: Colors.grey[900],
+          title: Text("Warning", style: TextStyle(color: Colors.white)),
+          content: Text(
+            "Login Failed",
+            style: TextStyle(color: Colors.white70),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                "OK",
+                style: TextStyle(color: Colors.yellow[700]),
+              ),
+            ),
+          ],
+        ),
+      );    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,8 +161,7 @@ class _LoginPage extends State<LoginPage> {
                           width: 2,
                         ),
                       ),
-                      contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     ),
                   ),
                   SizedBox(height: 20),
@@ -104,8 +182,7 @@ class _LoginPage extends State<LoginPage> {
                           width: 2,
                         ),
                       ),
-                      contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                       suffixIcon: IconButton(
                         onPressed: () {
                           setState(() {
@@ -113,9 +190,7 @@ class _LoginPage extends State<LoginPage> {
                           });
                         },
                         icon: Icon(
-                          _isPasswordHidden
-                              ? Icons.visibility_off
-                              : Icons.visibility,
+                          _isPasswordHidden ? Icons.visibility_off : Icons.visibility,
                           color: Colors.grey,
                         ),
                       ),
@@ -125,24 +200,9 @@ class _LoginPage extends State<LoginPage> {
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFCAAF2D),
-                      minimumSize: Size(double.infinity, 50), // عرض كامل
+                      minimumSize: Size(double.infinity, 50),
                     ),
-                      onPressed: () async {
-                        final authVM = context.read<AuthViewModel>();
-
-                        bool success = await authVM.login(
-                          emailController.text.trim(),
-                          passwordController.text.trim(),
-                        );
-
-                        if (success) {
-                          Navigator.pushReplacementNamed(context, "home");
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(authVM.errorMessage ?? "Login failed")),
-                          );
-                        }
-                      },
+                    onPressed: _login,
                     child: Text(
                       "Login",
                       style: TextStyle(color: Colors.grey[900], fontSize: 18),
@@ -158,7 +218,7 @@ class _LoginPage extends State<LoginPage> {
                     },
                     child: Text(
                       "Don't have an account? Register",
-                      style: TextStyle(color: Color(0xFFCAAF2D),fontSize: 12),
+                      style: TextStyle(color: Color(0xFFCAAF2D), fontSize: 12),
                     ),
                   ),
                 ],

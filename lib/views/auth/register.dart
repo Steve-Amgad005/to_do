@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../../view_models/auth_view_model.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'login.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -14,11 +13,148 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPage extends State<RegisterPage> {
   bool _isPasswordHidden = true;
   bool _isPassworconfdHidden = true;
+
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
 
+  final String baseUrl = "https://todo-backend-oob0.onrender.com";
+
+  bool isLoading = false;
+
+  Future<void> registerUser() async {
+    String name = nameController.text.trim();
+    String email = emailController.text.trim();
+    String password = passwordController.text.trim();
+    String confirmPassword = confirmPasswordController.text.trim();
+
+    if (name.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
+      showDialog(
+        context: context,
+        builder:
+            (_) => AlertDialog(
+              backgroundColor: Colors.grey[900],
+              title: Text("Warning", style: TextStyle(color: Colors.white)),
+              content: Text(
+                "Please fill all fields",
+                style: TextStyle(color: Colors.white70),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    "OK",
+                    style: TextStyle(color: Colors.yellow[700]),
+                  ),
+                ),
+              ],
+            ),
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      showDialog(
+        context: context,
+        builder:
+            (_) => AlertDialog(
+              backgroundColor: Colors.grey[900],
+              title: Text("Warning", style: TextStyle(color: Colors.white)),
+              content: Text(
+                "Passwords do not match",
+                style: TextStyle(color: Colors.white70),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    "OK",
+                    style: TextStyle(color: Colors.yellow[700]),
+                  ),
+                ),
+              ],
+            ),
+      );
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final res = await http.post(
+        Uri.parse("$baseUrl/api/auth/register"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"name": name, "email": email, "password": password}),
+      );
+
+      if (res.statusCode == 201) {
+        // تسجيل ناجح
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => LoginPage()),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Registration successful! Please login.")),
+        );
+      } else {
+        // خطأ من السيرفر
+        final data = jsonDecode(res.body);
+        showDialog(
+          context: context,
+          builder:
+              (_) => AlertDialog(
+                backgroundColor: Colors.grey[900],
+                title: Text("Error", style: TextStyle(color: Colors.white)),
+                content: Text(
+                  data['message'] ?? "Registration failed",
+                  style: TextStyle(color: Colors.white70),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      "OK",
+                      style: TextStyle(color: Colors.yellow[700]),
+                    ),
+                  ),
+                ],
+              ),
+        );
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder:
+            (_) => AlertDialog(
+              backgroundColor: Colors.grey[900],
+              title: Text("Error", style: TextStyle(color: Colors.white)),
+              content: Text(
+                "Something went wrong",
+                style: TextStyle(color: Colors.white70),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    "OK",
+                    style: TextStyle(color: Colors.yellow[700]),
+                  ),
+                ),
+              ],
+            ),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,17 +213,12 @@ class _RegisterPage extends State<RegisterPage> {
                     decoration: InputDecoration(
                       hintText: "User Name",
                       hintStyle: TextStyle(color: Colors.grey),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey),
-                      ),
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(
                           color: Color(0xFFCAAF2D),
                           width: 2,
                         ),
                       ),
-                      contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     ),
                   ),
                   SizedBox(height: 20),
@@ -98,17 +229,12 @@ class _RegisterPage extends State<RegisterPage> {
                     decoration: InputDecoration(
                       hintText: "Email",
                       hintStyle: TextStyle(color: Colors.grey),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey),
-                      ),
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(
                           color: Color(0xFFCAAF2D),
                           width: 2,
                         ),
                       ),
-                      contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     ),
                   ),
                   SizedBox(height: 20),
@@ -116,21 +242,15 @@ class _RegisterPage extends State<RegisterPage> {
                     controller: passwordController,
                     obscureText: _isPasswordHidden,
                     style: TextStyle(color: Colors.white),
-                    cursorColor: Color(0xFFCAAF2D),
                     decoration: InputDecoration(
                       hintText: "Password",
                       hintStyle: TextStyle(color: Colors.grey),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey),
-                      ),
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(
                           color: Color(0xFFCAAF2D),
                           width: 2,
                         ),
                       ),
-                      contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                       suffixIcon: IconButton(
                         onPressed: () {
                           setState(() {
@@ -146,26 +266,20 @@ class _RegisterPage extends State<RegisterPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 30),
+                  SizedBox(height: 20),
                   TextFormField(
                     controller: confirmPasswordController,
                     obscureText: _isPassworconfdHidden,
                     style: TextStyle(color: Colors.white),
-                    cursorColor: Color(0xFFCAAF2D),
                     decoration: InputDecoration(
-                      hintText: "Password's Confirmation",
-                      hintStyle: TextStyle(color: Colors.grey,fontSize: 14),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey),
-                      ),
+                      hintText: "Confirm Password",
+                      hintStyle: TextStyle(color: Colors.grey),
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(
                           color: Color(0xFFCAAF2D),
                           width: 2,
                         ),
                       ),
-                      contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                       suffixIcon: IconButton(
                         onPressed: () {
                           setState(() {
@@ -182,52 +296,30 @@ class _RegisterPage extends State<RegisterPage> {
                     ),
                   ),
                   SizedBox(height: 30),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFCAAF2D),
-                      minimumSize: Size(double.infinity, 50), // عرض كامل
-                    ),
-                    onPressed: () async {
-
-                      if (passwordController.text != confirmPasswordController.text) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Passwords do not match")),
-                        );
-                        return;
-                      }
-
-                      final authVM = context.read<AuthViewModel>();
-
-                      bool success = await authVM.register(
-                        nameController.text.trim(),
-                        emailController.text.trim(),
-                        passwordController.text.trim(),
-                      );
-
-                      if (success) {
-                        Navigator.pushReplacementNamed(context, "home");
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(authVM.errorMessage ?? "Register failed")),
-                        );
-                      }
-                    },
-                    child: Text(
-                      "Sign Up",
-                      style: TextStyle(color: Colors.grey[900], fontSize: 18),
-                    ),
-                  ),
+                  isLoading
+                      ? CircularProgressIndicator(color: Color(0xFFCAAF2D))
+                      : ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFFCAAF2D),
+                          minimumSize: Size(double.infinity, 50),
+                        ),
+                        onPressed: registerUser,
+                        child: Text(
+                          "Sign Up",
+                          style: TextStyle(
+                            color: Colors.grey[900],
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
                   SizedBox(height: 10),
                   TextButton(
                     onPressed: () {
-                      Navigator.popAndPushNamed(
-                        context,
-                        'login',
-                      );
+                      Navigator.popAndPushNamed(context, 'login');
                     },
                     child: Text(
                       "Already have an account? Login",
-                      style: TextStyle(color: Color(0xFFCAAF2D),fontSize: 12),
+                      style: TextStyle(color: Color(0xFFCAAF2D), fontSize: 12),
                     ),
                   ),
                 ],
