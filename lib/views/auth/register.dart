@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../view_models/auth_view_model.dart';
 import 'login.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -12,6 +14,10 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPage extends State<RegisterPage> {
   bool _isPasswordHidden = true;
   bool _isPassworconfdHidden = true;
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
 
 
   @override
@@ -65,6 +71,7 @@ class _RegisterPage extends State<RegisterPage> {
                   ),
                   SizedBox(height: 30),
                   TextFormField(
+                    controller: nameController,
                     style: TextStyle(color: Colors.white),
                     cursorColor: Color(0xFFCAAF2D),
                     decoration: InputDecoration(
@@ -85,6 +92,7 @@ class _RegisterPage extends State<RegisterPage> {
                   ),
                   SizedBox(height: 20),
                   TextFormField(
+                    controller: emailController,
                     style: TextStyle(color: Colors.white),
                     cursorColor: Color(0xFFCAAF2D),
                     decoration: InputDecoration(
@@ -105,6 +113,7 @@ class _RegisterPage extends State<RegisterPage> {
                   ),
                   SizedBox(height: 20),
                   TextFormField(
+                    controller: passwordController,
                     obscureText: _isPasswordHidden,
                     style: TextStyle(color: Colors.white),
                     cursorColor: Color(0xFFCAAF2D),
@@ -137,8 +146,10 @@ class _RegisterPage extends State<RegisterPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 30),TextFormField(
-                    obscureText: _isPasswordHidden,
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: confirmPasswordController,
+                    obscureText: _isPassworconfdHidden,
                     style: TextStyle(color: Colors.white),
                     cursorColor: Color(0xFFCAAF2D),
                     decoration: InputDecoration(
@@ -176,7 +187,31 @@ class _RegisterPage extends State<RegisterPage> {
                       backgroundColor: Color(0xFFCAAF2D),
                       minimumSize: Size(double.infinity, 50), // عرض كامل
                     ),
-                    onPressed: () {},
+                    onPressed: () async {
+
+                      if (passwordController.text != confirmPasswordController.text) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Passwords do not match")),
+                        );
+                        return;
+                      }
+
+                      final authVM = context.read<AuthViewModel>();
+
+                      bool success = await authVM.register(
+                        nameController.text.trim(),
+                        emailController.text.trim(),
+                        passwordController.text.trim(),
+                      );
+
+                      if (success) {
+                        Navigator.pushReplacementNamed(context, "home");
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(authVM.errorMessage ?? "Register failed")),
+                        );
+                      }
+                    },
                     child: Text(
                       "Sign Up",
                       style: TextStyle(color: Colors.grey[900], fontSize: 18),

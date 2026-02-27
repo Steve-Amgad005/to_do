@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:to_do/views/widgets/add_task_sheet.dart';
 import 'package:to_do/views/widgets/task_card.dart';
 
+import '../view_models/auth_view_model.dart';
+
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
 
@@ -32,6 +34,21 @@ class _Homepage extends State<Homepage> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.logout, color: Colors.white),
+          onPressed: () async {
+            final authVM = context.read<AuthViewModel>();
+
+            await authVM.logout();
+
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              "login",
+                  (route) => false,
+            );
+          },
+        ),
+
         centerTitle: true,
         backgroundColor: Colors.black,
         title: Container(
@@ -70,7 +87,7 @@ class _Homepage extends State<Homepage> {
                 child: Text("Sort by priority", style: TextStyle(color: Color(0xFFCAAF2D))),
               ),
             ],
-          )
+          ),
 
         ],
       ),

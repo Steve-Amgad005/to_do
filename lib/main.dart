@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:to_do/view_models/auth_view_model.dart';
 import 'package:to_do/views/auth/login.dart';
 import 'package:to_do/views/auth/register.dart';
 import 'package:to_do/views/homepage.dart';
@@ -12,8 +13,11 @@ void main() async {
   await Hive.initFlutter();
   await Hive.openBox('tasksBox');
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => TaskViewModel(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => TaskViewModel()),
+        ChangeNotifierProvider(create: (_) => AuthViewModel()),
+      ],
       child: const MyApp(),
     ),
   );

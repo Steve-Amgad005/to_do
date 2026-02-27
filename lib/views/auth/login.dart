@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:to_do/views/auth/register.dart';
+
+import '../../view_models/auth_view_model.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,6 +13,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPage extends State<LoginPage> {
   bool _isPasswordHidden = true;
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +67,7 @@ class _LoginPage extends State<LoginPage> {
                   ),
                   SizedBox(height: 30),
                   TextFormField(
+                    controller: emailController,
                     style: TextStyle(color: Colors.white),
                     cursorColor: Color(0xFFCAAF2D),
                     decoration: InputDecoration(
@@ -82,6 +88,7 @@ class _LoginPage extends State<LoginPage> {
                   ),
                   SizedBox(height: 20),
                   TextFormField(
+                    controller: passwordController,
                     obscureText: _isPasswordHidden,
                     style: TextStyle(color: Colors.white),
                     cursorColor: Color(0xFFCAAF2D),
@@ -120,7 +127,22 @@ class _LoginPage extends State<LoginPage> {
                       backgroundColor: Color(0xFFCAAF2D),
                       minimumSize: Size(double.infinity, 50), // عرض كامل
                     ),
-                    onPressed: () {},
+                      onPressed: () async {
+                        final authVM = context.read<AuthViewModel>();
+
+                        bool success = await authVM.login(
+                          emailController.text.trim(),
+                          passwordController.text.trim(),
+                        );
+
+                        if (success) {
+                          Navigator.pushReplacementNamed(context, "home");
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(authVM.errorMessage ?? "Login failed")),
+                          );
+                        }
+                      },
                     child: Text(
                       "Login",
                       style: TextStyle(color: Colors.grey[900], fontSize: 18),
