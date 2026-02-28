@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:to_do/models/model.dart';
 import 'package:to_do/view_models/task_view_model.dart';
-import 'package:to_do/views/homepage.dart';
+import 'package:to_do/views/home/homepage.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do/views/widgets/add_task_sheet.dart';
 

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import '../services/auth_service.dart';
+import 'package:to_do/data/data_sources/auth_data_source.dart';
 
 class AuthViewModel extends ChangeNotifier {
   final AuthService _authService = AuthService();
 
   bool isLoading = false;
   String? errorMessage;
-
   String? token;
 
   Future<bool> register(String name, String email, String password) async {
@@ -42,10 +41,7 @@ class AuthViewModel extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
 
-    final response = await _authService.login(
-      email: email,
-      password: password,
-    );
+    final response = await _authService.login(email: email, password: password);
 
     isLoading = false;
 
@@ -75,5 +71,4 @@ class AuthViewModel extends ChangeNotifier {
     token = null;
     notifyListeners();
   }
-
 }

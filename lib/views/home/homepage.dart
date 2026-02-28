@@ -4,8 +4,7 @@ import 'package:to_do/view_models/task_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do/views/widgets/add_task_sheet.dart';
 import 'package:to_do/views/widgets/task_card.dart';
-
-import '../view_models/auth_view_model.dart';
+import '../../view_models/auth_view_model.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});

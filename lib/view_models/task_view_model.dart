@@ -1,72 +1,40 @@
 import 'package:flutter/material.dart';
 import '../models/model.dart';
-import 'package:hive/hive.dart';
+import '../data/repositories/task_repository.dart';
 
 class TaskViewModel extends ChangeNotifier {
-  List<Task> _tasks = [];
-  final Box box = Hive.box('tasksBox');
+  final TaskRepository repository;
 
-  TaskViewModel() {
+  TaskViewModel(this.repository) {
     loadTasks();
   }
 
+  List<Task> _tasks = [];
+
+  List<Task> get tasks => _tasks;
+  List<Task> get undonetasks => _tasks.where((t) => !t.isDone).toList();
+  List<Task> get finishedTasks => _tasks.where((t) => t.isDone).toList();
+
   void loadTasks() {
-    final data = box.values.toList();
-
-    _tasks =
-        data.map((item) {
-          return Task(
-            title: item['title'],
-            priority: item['priority'],
-            deadline: DateTime.parse(item['deadline']),
-            isDone: item['isDone'],
-          );
-        }).toList();
-
+    _tasks = repository.getTasks();
     notifyListeners();
   }
 
-  List<Task> get tasks => _tasks;
-
-  List<Task> get undonetasks => _tasks.where((t) => !t.isDone).toList();
-
-  List<Task> get finishedTasks => _tasks.where((t) => t.isDone).toList();
-
   void addTask(Task task) {
+    repository.addTask(task);
     _tasks.add(task);
-
-    box.add({
-      'title': task.title,
-      'priority': task.priority,
-      'deadline': task.deadline.toIso8601String(),
-      'isDone': task.isDone,
-    });
-
     notifyListeners();
   }
 
   void removeTask(Task task) {
-    int index = _tasks.indexOf(task);
-
-    box.deleteAt(index);
-    _tasks.removeAt(index);
-
+    repository.deleteTask(task);
+    _tasks.remove(task);
     notifyListeners();
   }
 
   void toggleTaskDone(Task task) {
-    int index = _tasks.indexOf(task);
-
     task.isDone = !task.isDone;
-
-    box.putAt(index, {
-      'title': task.title,
-      'priority': task.priority,
-      'deadline': task.deadline.toIso8601String(),
-      'isDone': task.isDone,
-    });
-
+    repository.updateTask(task);
     notifyListeners();
   }
-
 }
