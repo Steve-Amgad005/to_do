@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../view_models/task_view_model.dart';
-import '../../models/model.dart';
 import 'package:intl/intl.dart'; // لتنسيق التاريخ
+import 'package:provider/provider.dart';
+
+import '../../models/model.dart';
+import '../../view_models/task_view_model.dart';
 
 class AddTaskSheet extends StatefulWidget {
   const AddTaskSheet({super.key});
@@ -13,21 +14,16 @@ class AddTaskSheet extends StatefulWidget {
 
 class _AddTaskSheetState extends State<AddTaskSheet> {
   TextEditingController titleController = TextEditingController();
-  TextEditingController dateController = TextEditingController(); // للتاريخ
+  TextEditingController dateController = TextEditingController();
   String selectedPriority = "low";
-  DateTime selectedDate = DateTime.now(); // القيمة الافتراضية
+  DateTime selectedDate = DateTime.now(); //
 
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<TaskViewModel>(context, listen: false);
 
     return Padding(
-      padding: EdgeInsets.only(
-        bottom: 30,
-        left: 20,
-        right: 20,
-        top: 30,
-      ),
+      padding: EdgeInsets.only(bottom: 30, left: 20, right: 20, top: 30),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -61,11 +57,18 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
                 borderSide: BorderSide.none,
               ),
             ),
-            items: ["low", "medium", "high"]
-                .map((priority) => DropdownMenuItem(
-              value: priority,
-              child: Text(priority, style: TextStyle(color: Colors.white)),
-            )).toList(),
+            items:
+                ["low", "medium", "high"]
+                    .map(
+                      (priority) => DropdownMenuItem(
+                        value: priority,
+                        child: Text(
+                          priority,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    )
+                    .toList(),
             onChanged: (value) {
               setState(() {
                 selectedPriority = value!;
@@ -116,7 +119,9 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
                       setState(() {
                         selectedDate = pickedDate;
                         // تحويل التاريخ لنص
-                        dateController.text = DateFormat('yyyy/MM/dd').format(selectedDate);
+                        dateController.text = DateFormat(
+                          'yyyy/MM/dd',
+                        ).format(selectedDate);
                       });
                     }
                   },
@@ -126,21 +131,34 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
           ),
           SizedBox(height: 20),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFFCAAF2D),
+            ),
             onPressed: () {
-              if (titleController.text.trim().isEmpty ) {
+              if (titleController.text.trim().isEmpty) {
                 showDialog(
                   context: context,
-                  builder: (context) => AlertDialog(
-                    backgroundColor: Colors.grey[900],
-                    title: Text("Warning", style: TextStyle(color: Colors.white)),
-                    content: Text("Please enter task name", style: TextStyle(color: Colors.white70)),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text("OK", style: TextStyle(color: Colors.yellow[700])),
+                  builder:
+                      (context) => AlertDialog(
+                        backgroundColor: Colors.grey[900],
+                        title: Text(
+                          "Warning",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        content: Text(
+                          "Please enter task name",
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(
+                              "OK",
+                              style: TextStyle(color: Colors.yellow[700]),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
                 );
                 return;
               }
@@ -149,12 +167,15 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
                 Task(
                   title: titleController.text.trim(),
                   priority: selectedPriority,
-                  deadline: dateController.text.isEmpty? DateTime.now() : selectedDate,
+                  deadline:
+                      dateController.text.isEmpty
+                          ? DateTime.now()
+                          : selectedDate,
                 ),
               );
               Navigator.pop(context);
             },
-            child: Text("Add Task"),
+            child: Text("Add Task", style: TextStyle(color: Colors.black)),
           ),
         ],
       ),
