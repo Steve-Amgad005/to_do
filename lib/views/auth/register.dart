@@ -1,6 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
+
 import 'login.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -100,7 +102,12 @@ class _RegisterPage extends State<RegisterPage> {
           MaterialPageRoute(builder: (_) => LoginPage()),
         );
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Registration successful! Please login.")),
+          SnackBar(
+            content: Text(
+              "Registration successful! Please login.",
+              style: TextStyle(color: Color(0xFFCAAF2D)),
+            ),
+          ),
         );
       } else {
         // خطأ من السيرفر
