@@ -1,24 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:to_do/view_models/auth_view_model.dart';
 import 'package:to_do/views/auth/login.dart';
 import 'package:to_do/views/auth/register.dart';
 import 'package:to_do/views/home/homepage.dart';
-import 'package:provider/provider.dart';
+
+import 'data/data_sources/remote_task_data_source.dart';
 import 'data/data_sources/task_data_source.dart';
 import 'data/repositories/task_repository.dart';
 import 'models/model.dart';
 import 'view_models/task_view_model.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   Hive.registerAdapter(TaskAdapter());
+  await Hive.deleteBoxFromDisk('tasksBox'); // يمسح الـ box القديم
   await Hive.openBox<Task>('tasksBox');
 
   final taskDataSource = TaskDataSource();
-  final taskRepository = TaskRepository(taskDataSource);
-
+  final localDS = TaskDataSource();
+  final remoteDS = RemoteTaskDataSource(baseUrl: 'https://todo-backend-oob0.onrender.com'); // لازم تعمل كلاس للـ API
+  final taskRepository = TaskRepository(local: localDS, remote: remoteDS);
   runApp(
     MultiProvider(
       providers: [

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class AuthService {
+class AuthDataSource {
   final String baseUrl = "https://todo-backend-oob0.onrender.com";
 
   Future<Map<String, dynamic>> register({

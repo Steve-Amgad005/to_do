@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:to_do/models/model.dart';
 import 'package:to_do/view_models/task_view_model.dart';
-import 'package:provider/provider.dart';
 import 'package:to_do/views/widgets/add_task_sheet.dart';
 import 'package:to_do/views/widgets/task_card.dart';
+
 import '../../view_models/auth_view_model.dart';
 
 class Homepage extends StatefulWidget {
@@ -16,19 +17,40 @@ class Homepage extends StatefulWidget {
 class _Homepage extends State<Homepage> {
   TextEditingController searchController = TextEditingController();
   String searchQuery = "";
-
+  bool isLoading = false;
+  @override
+  void initState() {
+    super.initState();
+    _syncOnStart();
+  }
+  Future<void> _syncOnStart() async {
+    final token = "your_user_token"; // حط التوكن هنا
+    final viewModel = context.read<TaskViewModel>();
+    await viewModel.loadTasksOfflineFirst();
+    setState(() {
+      isLoading = false;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<TaskViewModel>(context);
 
     // فلترة المهام حسب البحث
-    List<Task> filteredUndone = viewModel.undonetasks
-        .where((task) => task.title.toLowerCase().contains(searchQuery.toLowerCase()))
-        .toList();
+    List<Task> filteredUndone =
+        viewModel.undonetasks
+            .where(
+              (task) =>
+                  task.title.toLowerCase().contains(searchQuery.toLowerCase()),
+            )
+            .toList();
 
-    List<Task> filteredFinished = viewModel.finishedTasks
-        .where((task) => task.title.toLowerCase().contains(searchQuery.toLowerCase()))
-        .toList();
+    List<Task> filteredFinished =
+        viewModel.finishedTasks
+            .where(
+              (task) =>
+                  task.title.toLowerCase().contains(searchQuery.toLowerCase()),
+            )
+            .toList();
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -43,7 +65,7 @@ class _Homepage extends State<Homepage> {
             Navigator.pushNamedAndRemoveUntil(
               context,
               "login",
-                  (route) => false,
+              (route) => false,
             );
           },
         ),
@@ -68,26 +90,42 @@ class _Homepage extends State<Homepage> {
             icon: Icon(Icons.sort, color: Colors.white),
             onSelected: (value) {
               if (value == "date") {
-                viewModel.tasks.sort((a, b) => a.deadline.compareTo(b.deadline));
+                viewModel.tasks.sort(
+                  (a, b) => a.deadline.compareTo(b.deadline),
+                );
               } else if (value == "priority") {
-                Map<String, int> priorityOrder = {"high": 3, "medium": 2, "low": 1};
-                viewModel.tasks.sort((a, b) => priorityOrder[b.priority]!.compareTo(priorityOrder[a.priority]!));
+                Map<String, int> priorityOrder = {
+                  "high": 3,
+                  "medium": 2,
+                  "low": 1,
+                };
+                viewModel.tasks.sort(
+                  (a, b) => priorityOrder[b.priority]!.compareTo(
+                    priorityOrder[a.priority]!,
+                  ),
+                );
               }
               viewModel.notifyListeners(); // لتحديث الـ UI بعد الـ sort
             },
             color: Colors.grey[900],
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: "date",
-                child: Text("Sort by date", style: TextStyle(color: Color(0xFFCAAF2D))),
-              ),
-              PopupMenuItem(
-                value: "priority",
-                child: Text("Sort by priority", style: TextStyle(color: Color(0xFFCAAF2D))),
-              ),
-            ],
+            itemBuilder:
+                (context) => [
+                  PopupMenuItem(
+                    value: "date",
+                    child: Text(
+                      "Sort by date",
+                      style: TextStyle(color: Color(0xFFCAAF2D)),
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: "priority",
+                    child: Text(
+                      "Sort by priority",
+                      style: TextStyle(color: Color(0xFFCAAF2D)),
+                    ),
+                  ),
+                ],
           ),
-
         ],
       ),
       bottomNavigationBar: Padding(
@@ -168,20 +206,21 @@ class _Homepage extends State<Homepage> {
             SizedBox(height: 10),
             // ListView للمهام غير المنجزة
             Expanded(
-              child: filteredUndone.isEmpty
-                  ? Center(
-                child: Text(
-                  "No undone tasks",
-                  style: TextStyle(color: Colors.grey, fontSize: 16),
-                ),
-              )
-                  : ListView.builder(
-                itemCount: filteredUndone.length,
-                itemBuilder: (context, index) {
-                  final task = filteredUndone[index];
-                  return TaskCard(task: task);
-                },
-              ),
+              child:
+                  filteredUndone.isEmpty
+                      ? Center(
+                        child: Text(
+                          "No undone tasks",
+                          style: TextStyle(color: Colors.grey, fontSize: 16),
+                        ),
+                      )
+                      : ListView.builder(
+                        itemCount: filteredUndone.length,
+                        itemBuilder: (context, index) {
+                          final task = filteredUndone[index];
+                          return TaskCard(task: task);
+                        },
+                      ),
             ),
             SizedBox(height: 20),
             // عنوان المهام المنجزة
@@ -196,20 +235,21 @@ class _Homepage extends State<Homepage> {
             SizedBox(height: 10),
             // ListView للمهام المنجزة
             Expanded(
-              child: filteredFinished.isEmpty
-                  ? Center(
-                child: Text(
-                  "No finished tasks",
-                  style: TextStyle(color: Colors.grey, fontSize: 16),
-                ),
-              )
-                  : ListView.builder(
-                itemCount: filteredFinished.length,
-                itemBuilder: (context, index) {
-                  final task = filteredFinished[index];
-                  return TaskCard(task: task);
-                },
-              ),
+              child:
+                  filteredFinished.isEmpty
+                      ? Center(
+                        child: Text(
+                          "No finished tasks",
+                          style: TextStyle(color: Colors.grey, fontSize: 16),
+                        ),
+                      )
+                      : ListView.builder(
+                        itemCount: filteredFinished.length,
+                        itemBuilder: (context, index) {
+                          final task = filteredFinished[index];
+                          return TaskCard(task: task);
+                        },
+                      ),
             ),
           ],
         ),

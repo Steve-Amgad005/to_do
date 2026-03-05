@@ -3,7 +3,8 @@ import 'package:hive/hive.dart';
 import 'package:to_do/data/data_sources/auth_data_source.dart';
 
 class AuthViewModel extends ChangeNotifier {
-  final AuthService _authService = AuthService();
+  final AuthDataSource _authDataSource = AuthDataSource();
+
 
   bool isLoading = false;
   String? errorMessage;
@@ -13,7 +14,7 @@ class AuthViewModel extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
 
-    final response = await _authService.register(
+    final response = await _authDataSource.register(
       name: name,
       email: email,
       password: password,
@@ -41,7 +42,7 @@ class AuthViewModel extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
 
-    final response = await _authService.login(email: email, password: password);
+    final response = await _authDataSource.login(email: email, password: password);
 
     isLoading = false;
 

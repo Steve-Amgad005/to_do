@@ -84,7 +84,7 @@ class TaskCard extends StatelessWidget {
             task.title,
             style: TextStyle(
               color: Colors.white,
-              decoration: task.isDone ? TextDecoration.lineThrough : null,
+              decoration: task.completed ? TextDecoration.lineThrough : null,
               decorationThickness: 3,
               decorationColor: Color(0xFFCAAF2D),
             ),
@@ -100,7 +100,7 @@ class TaskCard extends StatelessWidget {
           leading: Checkbox(
             checkColor: Color(0xFFCAAF2D),
             activeColor: Colors.grey[900],
-            value: task.isDone,
+            value: task.completed,
             onChanged: (_) {
               // هنا بنحدث الحالة عن طريق الـ Provider
               context.read<TaskViewModel>().toggleTaskDone(task);
